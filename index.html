@@ -12,8 +12,11 @@
         <div id="items-container"></div>
         <div class="button-group">
             <button id="calculateBtn" onclick="showTotal()">Calculate</button>
-            <button id="resetBtn" onclick="resetAll()">Reset</button>
-            <button id="addItemBtn" onclick="showAddItemForm()">Add Item</button>
+            <button id="resetBtn" onclick="closeModal()">Reset</button>
+            <div class="add-remove-buttons">
+                <button id="addItemBtn" onclick="showAddItemForm()">Add Item</button>
+                <button id="removeItemBtn" onclick="showRemoveItemForm()">Remove Item</button>
+            </div>
         </div>
         <div id="totalAmount" class="hidden">Total: ₹0</div>
     </div>
@@ -38,6 +41,36 @@
                 <label for="itemPrice">Item Price (₹):</label>
                 <input type="number" id="itemPrice" required>
                 <button type="submit" id="itemSubmitBtn">Add Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Remove Item -->
+    <div id="removeItemModal" class="modal hidden" role="dialog" aria-labelledby="removeItemModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <span class="close" onclick="closeRemoveItemModal()" aria-label="Close">&times;</span>
+            <h2 id="removeItemModalTitle">Remove Item</h2>
+            <form id="removeItemForm">
+                <label for="removeItemName">Item Name to Remove:</label>
+                <input type="text" id="removeItemName" required>
+                <button type="submit" id="removeItemSubmitBtn">Remove Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Edit Item -->
+    <div id="editItemModal" class="modal hidden" role="dialog" aria-labelledby="editItemModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditItemModal()" aria-label="Close">&times;</span>
+            <h2 id="editItemModalTitle">Edit Item</h2>
+            <form id="editItemForm">
+                <label for="editItemOldName">Current Item Name:</label>
+                <input type="text" id="editItemOldName" disabled>
+                <label for="editItemNewName">New Item Name:</label>
+                <input type="text" id="editItemNewName" required>
+                <label for="editItemPrice">New Price (₹):</label>
+                <input type="number" id="editItemPrice" required>
+                <button type="submit" id="editItemSubmitBtn">Update Item</button>
             </form>
         </div>
     </div>
