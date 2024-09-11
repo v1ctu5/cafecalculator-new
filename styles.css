@@ -76,7 +76,38 @@ h1 {
     gap: 10px;
 }
 
-#calculateBtn, #resetBtn, #addItemBtn {
+.add-remove-buttons {
+    display: flex;
+}
+
+#addItemBtn, #removeItemBtn {
+    padding: 12px;
+    color: #f7f5f2;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+    width: 50%;
+}
+
+#addItemBtn {
+    background-color: #C28A38;
+}
+
+#addItemBtn:hover {
+    background-color: #a57a2b;
+}
+
+#removeItemBtn {
+    background-color: #dc3545;
+}
+
+#removeItemBtn:hover {
+    background-color: #c82333;
+}
+
+#calculateBtn, #resetBtn {
     padding: 12px;
     color: #f7f5f2;
     border: none;
@@ -100,14 +131,6 @@ h1 {
 
 #resetBtn:hover {
     background-color: #c82333;
-}
-
-#addItemBtn {
-    background-color: #C28A38;
-}
-
-#addItemBtn:hover {
-    background-color: #a57a2b;
 }
 
 #totalAmount {
@@ -167,19 +190,19 @@ h1 {
     margin-top: 20px;
 }
 
-#itemForm {
+#itemForm, #removeItemForm, #editItemForm {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 10px;
 }
 
-#itemForm input {
+#itemForm input, #removeItemForm input, #editItemForm input {
     padding: 8px;
     font-size: 16px;
 }
 
-#itemSubmitBtn {
+#itemSubmitBtn, #removeItemSubmitBtn, #editItemSubmitBtn {
     background-color: #C28A38;
     color: #f7f5f2;
     border: none;
@@ -190,45 +213,31 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-#itemSubmitBtn:hover {
+#itemSubmitBtn:hover, #removeItemSubmitBtn:hover, #editItemSubmitBtn:hover {
     background-color: #a57a2b;
 }
 
-/* Edit button style */
-.item .edit-btn {
-    background: none;
-    border: none;
-    color: #C28A38;
-    cursor: pointer;
-    font-size: 18px;
-    margin-left: 10px;
-    transition: color 0.3s ease;
+.message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    color: #fff;
+    background-color: #5cb85c;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.item .edit-btn:hover {
-    color: #a57a2b;
+.message.show {
+    opacity: 1;
 }
 
-/* Responsive Design */
-@media (max-width: 600px) {
-    .container {
-        width: 95%;
-    }
+.message.error {
+    background-color: #d9534f;
+}
 
-    .item span {
-        font-size: 18px;
-    }
-
-    .quantity-controls button {
-        padding: 8px;
-        font-size: 16px;
-    }
-
-    #calculateBtn, #resetBtn, #addItemBtn {
-        font-size: 16px;
-    }
-
-    #itemSubmitBtn {
-        font-size: 16px;
-    }
+.message.success {
+    background-color: #5bc0de;
 }
