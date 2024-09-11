@@ -13,7 +13,7 @@ const quantities = JSON.parse(localStorage.getItem('quantities')) || {
     biscuit: 0
 };
 
-let currentItem = null;
+let currentEditItem = null;
 
 // Update the items container with the current prices and quantities
 function updateItemsContainer() {
@@ -28,7 +28,7 @@ function updateItemsContainer() {
                 <button aria-label="Increase ${item} quantity" onclick="changeQuantity('${item}', 1)">+</button>
                 <span id="quantity-${item}">${quantities[item]}</span>
                 <button aria-label="Decrease ${item} quantity" onclick="changeQuantity('${item}', -1)">-</button>
-                <button class="edit-btn" aria-label="Edit ${item}" onclick="editItem('${item}')">Edit</button>
+                <button class="edit-btn" aria-label="Edit ${item}" onclick="showEditItemModal('${item}')">Edit</button>
             </div>
         `;
         container.appendChild(itemDiv);
@@ -62,116 +62,147 @@ function showTotal() {
 // Close the total amount modal and reset quantities
 function closeModal() {
     document.getElementById('totalModal').classList.add('hidden');
-    resetAll();
+    resetQuantities();
+    displayMessage('Quantities have been reset', 'success');
 }
 
-// Reset all item quantities to zero
-function resetAll() {
+// Reset the quantities of all items
+function resetQuantities() {
     for (const item in quantities) {
         quantities[item] = 0;
         document.getElementById(`quantity-${item}`).textContent = quantities[item];
     }
-    document.getElementById('modalTotalAmount').textContent = 'Total: ₹0';
     saveToLocalStorage();
-    displayMessage('Quantities have been reset', 'success');
 }
 
-// Show the form to add a new item or edit an existing item
-function showAddItemForm() {
-    currentItem = null;
-    document.getElementById('itemModalTitle').textContent = 'Add New Item';
-    document.getElementById('itemName').value = '';
-    document.getElementById('itemPrice').value = '';
-    document.getElementById('itemSubmitBtn').textContent = 'Add Item';
-    document.getElementById('itemModal').classList.remove('hidden');
-}
-
-// Close the add/edit item modal
-function closeItemModal() {
-    document.getElementById('itemModal').classList.add('hidden');
-}
-
-// Prepare the form to edit an existing item
-function editItem(item) {
-    currentItem = item;
-    document.getElementById('itemModalTitle').textContent = 'Edit Item';
-    document.getElementById('itemName').value = capitalize(item);
-    document.getElementById('itemPrice').value = prices[item];
-    document.getElementById('itemSubmitBtn').textContent = 'Update Item';
-    document.getElementById('itemModal').classList.remove('hidden');
-}
-
-// Save prices and quantities to localStorage
+// Save the prices and quantities to localStorage
 function saveToLocalStorage() {
-    try {
-        localStorage.setItem('prices', JSON.stringify(prices));
-        localStorage.setItem('quantities', JSON.stringify(quantities));
-    } catch (e) {
-        console.error("Failed to save data to localStorage:", e);
+    localStorage.setItem('prices', JSON.stringify(prices));
+    localStorage.setItem('quantities', JSON.stringify(quantities));
+}
+
+// Add a new item
+function addItem(event) {
+    event.preventDefault();
+    const item = document.getElementById('itemName').value.toLowerCase();
+    const price = parseFloat(document.getElementById('itemPrice').value);
+
+    if (item && !prices[item] && !isNaN(price)) {
+        prices[item] = price;
+        quantities[item] = 0;
+        updateItemsContainer();
+        saveToLocalStorage();
+        displayMessage(`${capitalize(item)} added successfully`, 'success');
+        document.getElementById('itemForm').reset();
+        closeItemModal();
+    } else {
+        displayMessage('Invalid item or price', 'error');
     }
 }
 
-// Load prices and quantities from localStorage
-function loadFromLocalStorage() {
-    try {
-        const savedPrices = localStorage.getItem('prices');
-        const savedQuantities = localStorage.getItem('quantities');
+// Remove an item
+function removeItem(event) {
+    event.preventDefault();
+    const item = document.getElementById('removeItemName').value.toLowerCase();
 
-        if (savedPrices) {
-            Object.assign(prices, JSON.parse(savedPrices));
-        }
-        if (savedQuantities) {
-            Object.assign(quantities, JSON.parse(savedQuantities));
-        }
-    } catch (e) {
-        console.error("Failed to load data from localStorage:", e);
+    if (item && prices[item]) {
+        delete prices[item];
+        delete quantities[item];
+        updateItemsContainer();
+        saveToLocalStorage();
+        displayMessage(`${capitalize(item)} removed successfully`, 'success');
+        document.getElementById('removeItemForm').reset();
+        closeRemoveItemModal();
+    } else {
+        displayMessage('Item not found', 'error');
     }
+}
+
+// Show the edit item modal
+function showEditItemModal(item) {
+    currentEditItem = item;
+    document.getElementById('editItemOldName').value = capitalize(item);
+    document.getElementById('editItemNewName').value = item;
+    document.getElementById('editItemPrice').value = prices[item];
+    document.getElementById('editItemModal').classList.remove('hidden');
+}
+
+// Edit item
+function editItem(event) {
+    event.preventDefault();
+    const oldName = currentEditItem;
+    const newName = document.getElementById('editItemNewName').value.toLowerCase();
+    const newPrice = parseFloat(document.getElementById('editItemPrice').value);
+
+    if (oldName && newName && !isNaN(newPrice)) {
+        if (newName !== oldName) {
+            if (prices[newName]) {
+                displayMessage('An item with this name already exists', 'error');
+                return;
+            }
+            prices[newName] = prices[oldName];
+            quantities[newName] = quantities[oldName];
+            delete prices[oldName];
+            delete quantities[oldName];
+        } else {
+            prices[newName] = newPrice;
+        }
+
+        prices[newName] = newPrice;
+        updateItemsContainer();
+        saveToLocalStorage();
+        displayMessage(`${capitalize(newName)} updated successfully`, 'success');
+        closeEditItemModal();
+    } else {
+        displayMessage('Invalid name or price', 'error');
+    }
+}
+
+// Close the edit item modal
+function closeEditItemModal() {
+    document.getElementById('editItemModal').classList.add('hidden');
 }
 
 // Display a message to the user
 function displayMessage(message, type) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
+    messageDiv.className = `message ${type} show`;
     messageDiv.textContent = message;
     document.body.appendChild(messageDiv);
-    setTimeout(() => messageDiv.remove(), 3000);
+    setTimeout(() => {
+        messageDiv.classList.remove('show');
+        setTimeout(() => messageDiv.remove(), 300);
+    }, 3000);
 }
 
-// Handle form submission to add or update an item
-document.getElementById('itemForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const itemName = document.getElementById('itemName').value.trim().toLowerCase();
-    const itemPrice = parseFloat(document.getElementById('itemPrice').value);
+// Show add item form modal
+function showAddItemForm() {
+    document.getElementById('itemModal').classList.remove('hidden');
+}
 
-    if (!itemName) {
-        displayMessage('Item name cannot be empty', 'error');
-        return;
-    }
+// Close add item form modal
+function closeItemModal() {
+    document.getElementById('itemModal').classList.add('hidden');
+}
 
-    if (currentItem && itemName !== currentItem && prices[itemName]) {
-        displayMessage('An item with this name already exists', 'error');
-        return;
-    }
+// Show remove item form modal
+function showRemoveItemForm() {
+    document.getElementById('removeItemModal').classList.remove('hidden');
+}
 
-    if (currentItem) {
-        delete prices[currentItem];
-        delete quantities[currentItem];
-        prices[itemName] = itemPrice;
-        quantities[itemName] = 0;
-        displayMessage('Item updated successfully', 'success');
-    } else {
-        prices[itemName] = itemPrice;
-        quantities[itemName] = 0;
-        displayMessage('Item added successfully', 'success');
-    }
+// Close remove item form modal
+function closeRemoveItemModal() {
+    document.getElementById('removeItemModal').classList.add('hidden');
+}
 
-    updateItemsContainer();
-    closeItemModal();
-    saveToLocalStorage();
-});
+// Add event listeners
+document.getElementById('itemForm').addEventListener('submit', addItem);
+document.getElementById('removeItemForm').addEventListener('submit', removeItem);
+document.getElementById('calculateBtn').addEventListener('click', showTotal);
+document.getElementById('resetBtn').addEventListener('click', closeModal);
+document.getElementById('addItemBtn').addEventListener('click', showAddItemForm);
+document.getElementById('removeItemBtn').addEventListener('click', showRemoveItemForm);
+document.getElementById('editItemForm').addEventListener('submit', editItem);
 
-// Load data and update UI when the page is loaded
-window.onload = function() {
-    loadFromLocalStorage();
-    updateItemsContainer();
-};
+// Initialize the app
+updateItemsContainer();
