@@ -19,10 +19,41 @@ body {
     text-align: center;
 }
 
-h1 {
-    font-size: 36px;
-    color: #333;
+/* Header Section */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between heading and Instagram logo */
     margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    flex: 1; /* Allows the heading to take up available space */
+    text-align: center; /* Centers the heading */
+    color: #333; /* Change heading color to ensure visibility */
+}
+
+/* Instagram logo styles */
+.instagram-link {
+    display: flex;
+    align-items: center;
+}
+
+.instagram-logo {
+    width: 30px; /* Adjust the size of the logo as needed */
+    height: 30px; /* Adjust the size of the logo as needed */
+    border-radius: 50%;
+    margin-left: -30px; /* Adjusts space between the logo and any element to its left */
+}
+
+#items-container {
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px; /* Optional, adds some spacing */
+    border: 1px solid #ddd; /* Optional, adds a border */
+    border-radius: 8px; /* Optional, rounds the corners */
+    background-color: #f9f9f9; /* Optional, sets background color */
 }
 
 .item {
